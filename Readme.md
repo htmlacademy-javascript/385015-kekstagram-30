@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм»
 
-* Студент: [Александр Дорошенко](https://up.htmlacademy.ru/javascript/30/user/385015).
-* Наставник: `Неизвестно`.
+- Студент: [Александр Дорошенко](https://up.htmlacademy.ru/javascript/30/user/385015).
+- Наставник: [Роман Марченко] (https://htmlacademy.ru/profile/id505487cd).
 
 ---
 

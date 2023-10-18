@@ -107,13 +107,13 @@ const getComments = (quantity) => {
 
 const getPictures = () => {
   const pictures = [];
-  const generateID = createRandomIdFromRangeGenerator(1, 25);
-  const generateUrl = createRandomIdFromRangeGenerator(1, 25);
+  const generateID = createRandomIdFromRangeGenerator(1, PICTURE_QUANTITY);
+  const generateUrlID = createRandomIdFromRangeGenerator(1, PICTURE_QUANTITY);
 
   for (let i = 0; i < PICTURE_QUANTITY; i++) {
     const picture = {
       id: generateID(),
-      url: `photos/${generateUrl()}.jpg`,
+      url: `photos/${generateUrlID()}.jpg`,
       description: PICTURE_DESCRIPTIONS[i],
       likes: getRandom(LikeQuantity.MIN, LikeQuantity.MAX),
       comments: getComments(

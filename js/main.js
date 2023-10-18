@@ -105,24 +105,23 @@ const getComments = (quantity) => {
   return comments;
 };
 
+const generatePictureID = createRandomIdFromRangeGenerator(1, PICTURE_QUANTITY);
+const generateUrlID = createRandomIdFromRangeGenerator(1, PICTURE_QUANTITY);
+const generateDescriptionID = createRandomIdFromRangeGenerator(
+  1,
+  PICTURE_DESCRIPTIONS.length - 1
+);
+
+const createPicture = () => ({
+  id: generatePictureID(),
+  url: `photos/${generateUrlID()}.jpg`,
+  description: PICTURE_DESCRIPTIONS[generateDescriptionID()],
+  likes: getRandom(LikeQuantity.MIN, LikeQuantity.MAX),
+  comments: getComments(getRandom(CommentQuantity.MIN, CommentQuantity.MAX)),
+});
+
 const getPictures = () => {
-  const pictures = [];
-  const generateID = createRandomIdFromRangeGenerator(1, PICTURE_QUANTITY);
-  const generateUrlID = createRandomIdFromRangeGenerator(1, PICTURE_QUANTITY);
-
-  for (let i = 0; i < PICTURE_QUANTITY; i++) {
-    const picture = {
-      id: generateID(),
-      url: `photos/${generateUrlID()}.jpg`,
-      description: PICTURE_DESCRIPTIONS[i],
-      likes: getRandom(LikeQuantity.MIN, LikeQuantity.MAX),
-      comments: getComments(
-        getRandom(CommentQuantity.MIN, CommentQuantity.MAX)
-      ),
-    };
-
-    pictures.push(picture);
-  }
+  const pictures = Array.from({ length: PICTURE_QUANTITY }, createPicture);
 
   return pictures;
 };

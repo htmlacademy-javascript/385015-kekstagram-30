@@ -63,8 +63,26 @@ const NAMES = [
 ];
 
 const getRandom = (min, max) => {
-  const result = Math.random() * (max - min) + min;
-  return Math.round(result);
+  const lower = Math.ceil(Math.min(Math.abs(min), Math.abs(max)));
+  const upper = Math.floor(Math.max(Math.abs(min), Math.abs(max)));
+  const result = Math.random() * (upper - lower + 1) + lower;
+
+  return Math.floor(result);
+};
+
+const createRandomIdFromRangeGenerator = (min, max) => {
+  const previousValues = [];
+
+  return function () {
+    let currentValue = getRandom(min, max);
+
+    while (previousValues.includes(currentValue)) {
+      currentValue = getRandom(min, max);
+    }
+
+    previousValues.push(currentValue);
+    return currentValue;
+  };
 };
 
 const getComments = (quantity) => {
@@ -89,12 +107,13 @@ const getComments = (quantity) => {
 
 const getPictures = () => {
   const pictures = [];
+  const generateID = createRandomIdFromRangeGenerator(1, 25);
+  const generateUrl = createRandomIdFromRangeGenerator(1, 25);
 
   for (let i = 0; i < PICTURE_QUANTITY; i++) {
-    const counter = i + 1;
     const picture = {
-      id: counter,
-      url: `photos/${counter}.jpg`,
+      id: generateID(),
+      url: `photos/${generateUrl()}.jpg`,
       description: PICTURE_DESCRIPTIONS[i],
       likes: getRandom(LikeQuantity.MIN, LikeQuantity.MAX),
       comments: getComments(

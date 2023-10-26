@@ -5,12 +5,11 @@ const template = templateFragment.querySelector('.picture');
 
 const fragment = document.createDocumentFragment();
 
-const fillDataTemplate = (element, data) => {
-  element.querySelector('.picture__img').src = data.url;
-  element.querySelector('.picture__img').alt = data.description;
-  element.querySelector('.picture__comments').textContent =
-    data.comments.length;
-  element.querySelector('.picture__likes').textContent = data.likes;
+const fillDataTemplate = (element, { url, description, likes, comments }) => {
+  element.querySelector('.picture__img').src = url;
+  element.querySelector('.picture__img').alt = description;
+  element.querySelector('.picture__comments').textContent = comments.length;
+  element.querySelector('.picture__likes').textContent = likes;
 };
 
 const render = (dataArray) => {
@@ -19,7 +18,7 @@ const render = (dataArray) => {
 
     fillDataTemplate(element, item);
 
-    fragment.appendChild(element);
+    fragment.append(element);
   });
 
   container.append(fragment);

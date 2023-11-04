@@ -1,5 +1,5 @@
 const container = document.querySelector('.pictures');
-import { openModal } from './picture-full.js';
+import { openImage } from './picture-full.js';
 
 const templateFragment = document.querySelector('#picture').content;
 const template = templateFragment.querySelector('.picture');
@@ -14,16 +14,7 @@ const fillDataTemplate = (
   element.querySelector('.picture__img').alt = description;
   element.querySelector('.picture__comments').textContent = comments.length;
   element.querySelector('.picture__likes').textContent = likes;
-
-  // получение массива комментариев происходит через id изображения
-  // id может быть у превью/фулл изображения и аватарки
-  // поэтому чтобы id не смогли "пересекаться" - я сделал через добавление скрытого узла
-  const picureID = document.createElement('input');
-  picureID.classList.add('picture__id');
-  picureID.type = 'hidden';
-  picureID.textContent = id;
-
-  element.append(picureID);
+  element.dataset.pictureID = id;
 };
 
 const clickPreview = (dataArray) => {
@@ -32,21 +23,15 @@ const clickPreview = (dataArray) => {
       evt.preventDefault();
 
       const preview = evt.target.closest('.picture');
-      const pictureID = Number(
-        preview.querySelector('.picture__id').textContent
-      );
-      const pictureObject = dataArray.filter(
-        (item) => item.id === pictureID
-      )[0];
+      const pictureID = Number(preview.dataset.pictureID);
+      const pictureObject = dataArray.find((item) => item.id === pictureID);
 
-      openModal(pictureObject);
+      openImage(pictureObject);
     }
   });
 };
 
-const render = (dataArray) => {
-  document.createElement('ul');
-
+const renderBoard = (dataArray) => {
   dataArray.forEach((item) => {
     const element = template.cloneNode(true);
 
@@ -59,4 +44,4 @@ const render = (dataArray) => {
   clickPreview(dataArray);
 };
 
-export { render };
+export { renderBoard };

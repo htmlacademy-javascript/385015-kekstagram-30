@@ -1,3 +1,5 @@
+import { openModal } from './modal.js';
+
 const COMMENT_SHOW_COUNT = 5; // пусть будет - потом пригодится
 const modal = document.querySelector('.big-picture');
 const imageURL = modal.querySelector('.big-picture__img img');
@@ -12,7 +14,6 @@ const imageCommentsCountShown = imageCommentsCount.querySelector(
 );
 const commentsContainer = modal.querySelector('.social__comments');
 const commentsLoader = modal.querySelector('.comments-loader');
-const buttonClose = modal.querySelector('.big-picture__cancel');
 
 const templateFragment = document.querySelector('#comment').content;
 const template = templateFragment.querySelector('.social__comment');
@@ -29,28 +30,7 @@ const getComments = (comments) => {
   });
 };
 
-const onDocumentKeydown = (evt) => {
-  if (evt.key === 'Escape' || evt.key === 'Enter') {
-    evt.preventDefault();
-    closeModal();
-  }
-};
-
-const onButtonCloseClick = () => {
-  closeModal();
-};
-
-function closeModal() {
-  document.body.classList.remove('modal-open');
-  modal.classList.add('hidden');
-
-  commentsContainer.innerHTML = '';
-
-  document.removeEventListener('keydown', onDocumentKeydown);
-  buttonClose.removeEventListener('click', onButtonCloseClick);
-}
-
-function openModal({ url, likes, description, comments }) {
+function openImage({ url, likes, description, comments }) {
   imageURL.src = url;
   imageDescription.textContent = description;
   imageLikesCount.textContent = likes;
@@ -59,16 +39,13 @@ function openModal({ url, likes, description, comments }) {
     comments.length < COMMENT_SHOW_COUNT ? comments.length : COMMENT_SHOW_COUNT;
 
   getComments(comments);
-
+  commentsContainer.innerHTML = '';
   commentsContainer.append(fragment);
 
   imageCommentsCount.classList.add('hidden');
   commentsLoader.classList.add('hidden');
-  document.body.classList.add('modal-open');
-  modal.classList.remove('hidden');
 
-  document.addEventListener('keydown', onDocumentKeydown);
-  buttonClose.addEventListener('click', onButtonCloseClick);
+  openModal(modal, commentsContainer, 'image');
 }
 
-export { openModal };
+export { openImage };

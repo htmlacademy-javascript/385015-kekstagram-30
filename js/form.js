@@ -6,7 +6,7 @@ const uploadOverlay = document.querySelector('.img-upload__overlay');
 
 const openForm = () => {
   uploadControl.addEventListener('change', () => {
-    openModal(uploadOverlay, uploadControl, 'uploadForm');
+    openModal(uploadOverlay, 'uploadForm');
     validateForm();
   });
 };

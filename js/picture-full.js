@@ -20,7 +20,7 @@ const template = templateFragment.querySelector('.social__comment');
 
 const fragment = document.createDocumentFragment();
 
-const getComments = (comments) => {
+function getComments(comments) {
   comments.forEach((commentData) => {
     const commentTemplate = template.cloneNode(true);
     commentTemplate.querySelector('.social__picture').src = commentData.avatar;
@@ -28,7 +28,7 @@ const getComments = (comments) => {
       commentData.message;
     fragment.append(commentTemplate);
   });
-};
+}
 
 function openImage({ url, likes, description, comments }) {
   imageURL.src = url;
@@ -39,13 +39,12 @@ function openImage({ url, likes, description, comments }) {
     comments.length < COMMENT_SHOW_COUNT ? comments.length : COMMENT_SHOW_COUNT;
 
   getComments(comments);
-  commentsContainer.innerHTML = '';
   commentsContainer.append(fragment);
 
   imageCommentsCount.classList.add('hidden');
   commentsLoader.classList.add('hidden');
 
-  openModal(modal, commentsContainer, 'image');
+  openModal(modal, 'image');
 }
 
 export { openImage };

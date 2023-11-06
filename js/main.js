@@ -1,4 +1,7 @@
 import { getPictures } from './data.js';
-import { render } from './render.js';
+import { openForm } from './form.js';
+import { renderBoard } from './render.js';
 
-render(getPictures());
+renderBoard(getPictures());
+
+openForm();

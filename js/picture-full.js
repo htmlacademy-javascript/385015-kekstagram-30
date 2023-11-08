@@ -1,7 +1,8 @@
-import { openModal } from './modal.js';
+import { openModal, closeModal } from './modal.js';
 
 const COMMENT_SHOW_COUNT = 5; // пусть будет - потом пригодится
 const modal = document.querySelector('.big-picture');
+const buttonCloseImage = document.querySelector('.big-picture__cancel');
 const imageURL = modal.querySelector('.big-picture__img img');
 const imageDescription = modal.querySelector('.social__caption');
 const imageLikesCount = modal.querySelector('.likes-count');
@@ -30,7 +31,31 @@ function getComments(comments) {
   });
 }
 
+function clearData() {
+  commentsContainer.innerHTML = '';
+}
+
+function onButtonCloseClick() {
+  closeModal(modal);
+  clearData();
+
+  buttonCloseImage.removeEventListener('click', onButtonCloseClick);
+  document.removeEventListener('keydown', onDocumentKeydown);
+}
+
+function onDocumentKeydown(evt) {
+  if (evt.key === 'Escape') {
+    closeModal(modal);
+    clearData();
+
+    buttonCloseImage.removeEventListener('click', onButtonCloseClick);
+    document.removeEventListener('keydown', onDocumentKeydown);
+  }
+}
+
 function openImage({ url, likes, description, comments }) {
+  clearData();
+
   imageURL.src = url;
   imageDescription.textContent = description;
   imageLikesCount.textContent = likes;
@@ -44,7 +69,10 @@ function openImage({ url, likes, description, comments }) {
   imageCommentsCount.classList.add('hidden');
   commentsLoader.classList.add('hidden');
 
-  openModal(modal, 'image');
+  openModal(modal);
+
+  buttonCloseImage.addEventListener('click', onButtonCloseClick);
+  document.addEventListener('keydown', onDocumentKeydown);
 }
 
 export { openImage };

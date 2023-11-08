@@ -68,12 +68,7 @@ const validateForm = () => {
     'Длина комментария больше 140 символов'
   );
 
-  uploadForm.addEventListener('submit', (evt) => {
-    const isValid = pristine.validate();
-    if (!isValid) {
-      evt.preventDefault();
-    }
-  });
+  return pristine.validate();
 };
 
 export { validateForm };

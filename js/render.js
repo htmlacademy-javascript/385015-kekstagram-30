@@ -1,5 +1,5 @@
-const container = document.querySelector('.pictures');
 import { openImage } from './picture-full.js';
+const container = document.querySelector('.pictures');
 
 const templateFragment = document.querySelector('#picture').content;
 const template = templateFragment.querySelector('.picture');

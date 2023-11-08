@@ -1,7 +1,14 @@
-import { getPictures } from './data.js';
+import { showMessage } from './message-show.js';
+import { getData } from './api.js';
 import { openForm } from './form.js';
 import { renderBoard } from './render.js';
 
-renderBoard(getPictures());
+getData()
+  .then((pictures) => {
+    renderBoard(pictures);
+  })
+  .catch(() => {
+    showMessage('data-error');
+  });
 
 openForm();

@@ -24,8 +24,6 @@ const effectLevelCounter = document.querySelector('.effect-level__value');
 const sliderElement = document.querySelector('.effect-level__slider');
 const effectsList = document.querySelector('.effects__list');
 
-// uploadOverlay.classList.remove('hidden'); // для проверки работы с эффектами
-
 const hashtagField = document.querySelector('.text__hashtags');
 const commentField = document.querySelector('.text__description');
 
@@ -90,6 +88,7 @@ function onScaleButtonSmallerClick() {
     changeScale();
   }
 }
+
 function onScaleButtonBiggerClick() {
   if (scaleCount < 100) {
     scaleCount += 25;

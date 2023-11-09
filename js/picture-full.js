@@ -31,30 +31,27 @@ function getComments(comments) {
   });
 }
 
-function clearData() {
+function resetElement() {
   commentsContainer.innerHTML = '';
+
+  buttonCloseImage.removeEventListener('click', onButtonCloseClick);
+  document.removeEventListener('keydown', onModalKeydown);
 }
 
 function onButtonCloseClick() {
   closeModal(modal);
-  clearData();
-
-  buttonCloseImage.removeEventListener('click', onButtonCloseClick);
-  document.removeEventListener('keydown', onDocumentKeydown);
+  resetElement();
 }
 
-function onDocumentKeydown(evt) {
+function onModalKeydown(evt) {
   if (evt.key === 'Escape') {
     closeModal(modal);
-    clearData();
-
-    buttonCloseImage.removeEventListener('click', onButtonCloseClick);
-    document.removeEventListener('keydown', onDocumentKeydown);
+    resetElement();
   }
 }
 
 function openImage({ url, likes, description, comments }) {
-  clearData();
+  resetElement();
 
   imageURL.src = url;
   imageDescription.textContent = description;
@@ -72,7 +69,7 @@ function openImage({ url, likes, description, comments }) {
   openModal(modal);
 
   buttonCloseImage.addEventListener('click', onButtonCloseClick);
-  document.addEventListener('keydown', onDocumentKeydown);
+  document.addEventListener('keydown', onModalKeydown);
 }
 
 export { openImage };

@@ -19,7 +19,7 @@ const validateForm = () => {
   });
 
   function validateHashTag(value) {
-    hashtagsArray = value.split(' ');
+    hashtagsArray = value.toLowerCase().split(' ');
     const isHashTag = (string) => hashtag.test(string);
     formSubmit.removeAttribute('disabled');
 

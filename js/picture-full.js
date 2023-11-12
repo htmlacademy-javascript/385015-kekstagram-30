@@ -1,7 +1,11 @@
-import { openModal } from './modal.js';
+import { openModal, closeModal } from './modal.js';
 
-const COMMENT_SHOW_COUNT = 5; // пусть будет - потом пригодится
+const COMMENT_SHOW_STEP = 5;
+let commentsArray = [];
+let commentsRender = 0;
+
 const modal = document.querySelector('.big-picture');
+const buttonCloseImage = document.querySelector('.big-picture__cancel');
 const imageURL = modal.querySelector('.big-picture__img img');
 const imageDescription = modal.querySelector('.social__caption');
 const imageLikesCount = modal.querySelector('.likes-count');
@@ -15,19 +19,72 @@ const imageCommentsCountShown = imageCommentsCount.querySelector(
 const commentsContainer = modal.querySelector('.social__comments');
 const commentsLoader = modal.querySelector('.comments-loader');
 
-const templateFragment = document.querySelector('#comment').content;
-const template = templateFragment.querySelector('.social__comment');
+function getCountComments(comments) {
+  commentsLoader.classList.remove('hidden');
+  if (commentsRender < comments.length) {
+    commentsRender += COMMENT_SHOW_STEP;
+    if (commentsRender >= comments.length) {
+      commentsLoader.classList.add('hidden');
+    }
+  }
 
-const fragment = document.createDocumentFragment();
+  return commentsRender;
+}
+
+function getPartComments(comments) {
+  return comments.slice(0, getCountComments(comments));
+}
+
+function updateCountComments() {
+  commentsContainer.innerHTML = '';
+  getComments(commentsArray);
+}
 
 function getComments(comments) {
-  comments.forEach((commentData) => {
+  commentsArray = comments;
+  const templateFragment = document.querySelector('#comment').content;
+  const template = templateFragment.querySelector('.social__comment');
+
+  const fragment = document.createDocumentFragment();
+
+  const partComments = getPartComments(comments);
+  partComments.forEach((commentData) => {
     const commentTemplate = template.cloneNode(true);
     commentTemplate.querySelector('.social__picture').src = commentData.avatar;
     commentTemplate.querySelector('.social__text').textContent =
       commentData.message;
     fragment.append(commentTemplate);
   });
+
+  commentsContainer.append(fragment);
+
+  imageCommentsCountTotal.textContent = comments.length;
+  imageCommentsCountShown.textContent =
+    comments.length < partComments.length
+      ? comments.length
+      : partComments.length;
+
+  commentsLoader.addEventListener('click', updateCountComments);
+}
+
+function resetElement() {
+  commentsContainer.innerHTML = '';
+  commentsRender = 0;
+
+  buttonCloseImage.removeEventListener('click', onButtonCloseClick);
+  document.removeEventListener('keydown', onModalKeydown);
+}
+
+function onButtonCloseClick() {
+  closeModal(modal);
+  resetElement();
+}
+
+function onModalKeydown(evt) {
+  if (evt.key === 'Escape') {
+    closeModal(modal);
+    resetElement();
+  }
 }
 
 function openImage({ url, likes, description, comments }) {
@@ -36,15 +93,16 @@ function openImage({ url, likes, description, comments }) {
   imageLikesCount.textContent = likes;
   imageCommentsCountTotal.textContent = comments.length;
   imageCommentsCountShown.textContent =
-    comments.length < COMMENT_SHOW_COUNT ? comments.length : COMMENT_SHOW_COUNT;
+    comments.length < COMMENT_SHOW_STEP ? comments.length : COMMENT_SHOW_STEP;
 
   getComments(comments);
-  commentsContainer.append(fragment);
 
-  imageCommentsCount.classList.add('hidden');
-  commentsLoader.classList.add('hidden');
+  openModal(modal);
 
-  openModal(modal, 'image');
+  buttonCloseImage.addEventListener('click', onButtonCloseClick);
+  document.addEventListener('keydown', onModalKeydown);
 }
+
+resetElement();
 
 export { openImage };

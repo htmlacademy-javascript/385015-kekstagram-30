@@ -19,7 +19,7 @@ const validateForm = () => {
   });
 
   function validateHashTag(value) {
-    hashtagsArray = value.split(' ');
+    hashtagsArray = value.toLowerCase().split(' ');
     const isHashTag = (string) => hashtag.test(string);
     formSubmit.removeAttribute('disabled');
 
@@ -68,12 +68,7 @@ const validateForm = () => {
     'Длина комментария больше 140 символов'
   );
 
-  uploadForm.addEventListener('submit', (evt) => {
-    const isValid = pristine.validate();
-    if (!isValid) {
-      evt.preventDefault();
-    }
-  });
+  return pristine.validate();
 };
 
 export { validateForm };

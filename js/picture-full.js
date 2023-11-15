@@ -19,7 +19,7 @@ const imageCommentsCountShown = imageCommentsCount.querySelector(
 const commentsContainer = modal.querySelector('.social__comments');
 const commentsLoader = modal.querySelector('.comments-loader');
 
-function getCountComments(comments) {
+const getCountComments = (comments) => {
   commentsLoader.classList.remove('hidden');
   if (commentsRender < comments.length) {
     commentsRender += COMMENT_SHOW_STEP;
@@ -29,18 +29,12 @@ function getCountComments(comments) {
   }
 
   return commentsRender;
-}
+};
 
-function getPartComments(comments) {
-  return comments.slice(0, getCountComments(comments));
-}
+const getPartComments = (comments) =>
+  comments.slice(0, getCountComments(comments));
 
-function updateCountComments() {
-  commentsContainer.innerHTML = '';
-  getComments(commentsArray);
-}
-
-function getComments(comments) {
+const getComments = (comments) => {
   commentsArray = comments;
   const templateFragment = document.querySelector('#comment').content;
   const template = templateFragment.querySelector('.social__comment');
@@ -65,29 +59,21 @@ function getComments(comments) {
       : partComments.length;
 
   commentsLoader.addEventListener('click', updateCountComments);
-}
+};
 
-function resetElement() {
-  commentsContainer.innerHTML = '';
-  commentsRender = 0;
-
-  buttonCloseImage.removeEventListener('click', onButtonCloseClick);
-  document.removeEventListener('keydown', onModalKeydown);
-}
-
-function onButtonCloseClick() {
+const onButtonCloseClick = () => {
   closeModal(modal);
   resetElement();
-}
+};
 
-function onModalKeydown(evt) {
+const onModalKeydown = (evt) => {
   if (evt.key === 'Escape') {
     closeModal(modal);
     resetElement();
   }
-}
+};
 
-function openImage({ url, likes, description, comments }) {
+const openImage = ({ url, likes, description, comments }) => {
   imageURL.src = url;
   imageDescription.textContent = description;
   imageLikesCount.textContent = likes;
@@ -101,6 +87,19 @@ function openImage({ url, likes, description, comments }) {
 
   buttonCloseImage.addEventListener('click', onButtonCloseClick);
   document.addEventListener('keydown', onModalKeydown);
+};
+
+function resetElement() {
+  commentsContainer.innerHTML = '';
+  commentsRender = 0;
+
+  buttonCloseImage.removeEventListener('click', onButtonCloseClick);
+  document.removeEventListener('keydown', onModalKeydown);
+}
+
+function updateCountComments() {
+  commentsContainer.innerHTML = '';
+  getComments(commentsArray);
 }
 
 resetElement();

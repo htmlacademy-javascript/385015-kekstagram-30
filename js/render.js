@@ -31,7 +31,16 @@ const clickPreview = (dataArray) => {
   });
 };
 
+const resetBoard = () => {
+  const pictureCollection = container.querySelectorAll('.picture');
+  pictureCollection.forEach((element) => {
+    element.remove();
+  });
+};
+
 const renderBoard = (dataArray) => {
+  resetBoard();
+
   dataArray.forEach((item) => {
     const element = template.cloneNode(true);
 
@@ -44,4 +53,8 @@ const renderBoard = (dataArray) => {
   clickPreview(dataArray);
 };
 
-export { renderBoard };
+const initBorder = (dataArray) => {
+  renderBoard(dataArray);
+};
+
+export { initBorder, renderBoard };

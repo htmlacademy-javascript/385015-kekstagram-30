@@ -6,19 +6,13 @@ const getRandom = (min, max) => {
   return Math.floor(result);
 };
 
-const createRandomIdFromRangeGenerator = (min, max) => {
-  const previousValues = [];
+const debounce = (callback, timeoutDelay = 1000) => {
+  let timeoutId;
 
-  return function () {
-    let currentValue = getRandom(min, max);
-
-    while (previousValues.includes(currentValue)) {
-      currentValue = getRandom(min, max);
-    }
-
-    previousValues.push(currentValue);
-    return currentValue;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
   };
 };
 
-export { getRandom, createRandomIdFromRangeGenerator };
+export { getRandom, debounce };

@@ -1,8 +1,33 @@
-const showMessage = (templateName, callbackModal = null) => {
-  const MESSAGE_TIMEOUT = 5000;
-  const container = document.body;
+const MESSAGE_TIMEOUT = 5000;
+const container = document.body;
+
+let overlayMessage;
+let buttonMessage;
+let callbackModal;
+
+const onButtonMessageClick = () => {
+  resetElement();
+};
+
+const onOverlayMessageClick = (evt) => {
+  const blockMessage = document.querySelector('.success__inner');
+
+  if (evt.target !== blockMessage) {
+    resetElement();
+  }
+};
+
+const onMessageKeydown = (evt) => {
+  if (evt.key === 'Escape') {
+    resetElement();
+  }
+};
+
+const showMessage = (templateName, cb = null) => {
   const templateFragment = document.querySelector(`#${templateName}`).content;
   const template = templateFragment.querySelector(`.${templateName}`);
+
+  callbackModal = cb;
 
   const element = template.cloneNode(true);
 
@@ -11,34 +36,8 @@ const showMessage = (templateName, callbackModal = null) => {
 
   container.append(fragment);
 
-  const overlayMessage = document.querySelector(`.${templateName}`);
-  const blockMessage = document.querySelector('.success__inner');
-  const buttonMessage = overlayMessage.querySelector('button');
-
-  function resetElement() {
-    container.removeChild(overlayMessage);
-
-    buttonMessage.removeEventListener('click', onButtonMessageClick);
-    overlayMessage.removeEventListener('click', onOverlayMessageClick);
-    document.removeEventListener('keydown', onMessageKeydown);
-    document.addEventListener('keydown', callbackModal);
-  }
-
-  function onButtonMessageClick() {
-    resetElement();
-  }
-
-  function onOverlayMessageClick(evt) {
-    if (evt.target !== blockMessage) {
-      resetElement();
-    }
-  }
-
-  function onMessageKeydown(evt) {
-    if (evt.key === 'Escape') {
-      resetElement();
-    }
-  }
+  overlayMessage = document.querySelector(`.${templateName}`);
+  buttonMessage = overlayMessage.querySelector('button');
 
   if (templateName === 'data-error') {
     setTimeout(() => {
@@ -51,5 +50,14 @@ const showMessage = (templateName, callbackModal = null) => {
     document.removeEventListener('keydown', callbackModal);
   }
 };
+
+function resetElement() {
+  container.removeChild(overlayMessage);
+
+  buttonMessage.removeEventListener('click', onButtonMessageClick);
+  overlayMessage.removeEventListener('click', onOverlayMessageClick);
+  document.removeEventListener('keydown', onMessageKeydown);
+  document.addEventListener('keydown', callbackModal);
+}
 
 export { showMessage };

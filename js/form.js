@@ -23,30 +23,103 @@ const effectLevelContainer = document.querySelector(
 const effectLevelCounter = document.querySelector('.effect-level__value');
 const sliderElement = document.querySelector('.effect-level__slider');
 const effectsList = document.querySelector('.effects__list');
+const effectDefault = document.querySelector('#effect-none');
 
 const hashtagField = document.querySelector('.text__hashtags');
 const commentField = document.querySelector('.text__description');
 
-function resetElement() {
-  uploadControl.value = '';
-  hashtagField.value = '';
-  commentField.value = '';
+const Scale = {
+  MIN: 25,
+  MAX: 100,
+  STEP: 25,
+};
 
-  imageBlock.style = '';
+const Effect = {
+  DEFAULT: 'none',
+  CHROME: 'chrome',
+  SEPIA: 'sepia',
+  MARVIN: 'marvin',
+  PHOBOS: 'phobos',
+  HEAT: 'heat',
+};
 
-  buttonCloseOverlay.removeEventListener('click', onButtonCloseClick);
-  scaleButtonSmaller.removeEventListener('click', onScaleButtonSmallerClick);
-  scaleButtonBigger.removeEventListener('click', onScaleButtonBiggerClick);
-  uploadForm.removeEventListener('submit', onSubmitUploadForm);
-  document.removeEventListener('keydown', onModalKeydown);
-}
+const effectOptions = {
+  [Effect.DEFAULT]: {
+    filter: {
+      style: '',
+      unit: '',
+    },
+    slider: {
+      min: 0,
+      max: 100,
+      step: 1,
+    },
+  },
+  [Effect.CHROME]: {
+    filter: {
+      style: 'grayscale',
+      unit: '',
+    },
+    slider: {
+      min: 0,
+      max: 1,
+      step: 0.1,
+    },
+  },
+  [Effect.SEPIA]: {
+    filter: {
+      style: 'sepia',
+      unit: '',
+    },
+    slider: {
+      min: 0,
+      max: 1,
+      step: 0.1,
+    },
+  },
+  [Effect.MARVIN]: {
+    filter: {
+      style: 'invert',
+      unit: '%',
+    },
+    slider: {
+      min: 0,
+      max: 100,
+      step: 1,
+    },
+  },
+  [Effect.PHOBOS]: {
+    filter: {
+      style: 'blur',
+      unit: 'px',
+    },
+    slider: {
+      min: 0,
+      max: 3,
+      step: 0.1,
+    },
+  },
+  [Effect.HEAT]: {
+    filter: {
+      style: 'brightness',
+      unit: '',
+    },
+    slider: {
+      min: 1,
+      max: 3,
+      step: 0.1,
+    },
+  },
+};
 
-function onButtonCloseClick() {
+let activeEffect = Effect.DEFAULT;
+
+const onButtonCloseClick = () => {
   closeModal(uploadOverlay);
   resetElement();
-}
+};
 
-function onModalKeydown(evt) {
+const onModalKeydown = (evt) => {
   if (
     evt.target !== hashtagField &&
     evt.target !== commentField &&
@@ -55,9 +128,9 @@ function onModalKeydown(evt) {
     closeModal(uploadOverlay);
     resetElement();
   }
-}
+};
 
-function onSubmitUploadForm(evt) {
+const onSubmitUploadForm = (evt) => {
   const isValid = validateForm();
   evt.preventDefault();
   if (isValid) {
@@ -75,62 +148,48 @@ function onSubmitUploadForm(evt) {
         uploadFormSubmit.disabled = false;
       });
   }
-}
+};
 
-function changeScale() {
+const changeScale = () => {
   scaleValue.value = `${scaleCount}%`;
   imageBlock.style.transform = `scale(${scaleCount / 100})`;
-}
+};
 
-function onScaleButtonSmallerClick() {
-  if (scaleCount > 25) {
-    scaleCount -= 25;
+const onScaleButtonSmallerClick = () => {
+  if (scaleCount > Scale.MIN) {
+    scaleCount -= Scale.STEP;
     changeScale();
   }
-}
+};
 
-function onScaleButtonBiggerClick() {
-  if (scaleCount < 100) {
-    scaleCount += 25;
+const onScaleButtonBiggerClick = () => {
+  if (scaleCount < Scale.MAX) {
+    scaleCount += Scale.STEP;
     changeScale();
   }
-}
+};
 
-effectLevelContainer.classList.add('hidden');
-
-let effectStyle = '';
-
-noUiSlider.create(sliderElement, {
-  range: {
-    min: 0,
-    max: 100,
-  },
-  start: 100,
-  step: 1,
-  connect: 'lower',
-});
-
-sliderElement.noUiSlider.on('update', () => {
-  effectLevelCounter.value = parseFloat(sliderElement.noUiSlider.get());
-  changeStyle();
-});
-
-function changeStyle() {
-  effectLevelContainer.classList.remove('hidden');
-
-  if (effectStyle === 'blur') {
-    imageBlock.style.filter = `${effectStyle}(${effectLevelCounter.value}px)`;
-  } else if (effectStyle === 'invert') {
-    imageBlock.style.filter = `${effectStyle}(${effectLevelCounter.value}%)`;
-  } else if (effectStyle === 'none') {
-    effectLevelContainer.classList.add('hidden');
-    imageBlock.style = '';
+const changeStyle = (effect) => {
+  if (effect && effect !== effectOptions[Effect.DEFAULT]) {
+    const { style, unit } = effect.filter;
+    effectLevelContainer.classList.remove('hidden');
+    imageBlock.style.filter = `${style}(${effectLevelCounter.value}${unit})`;
   } else {
-    imageBlock.style.filter = `${effectStyle}(${effectLevelCounter.value})`;
+    effectLevelContainer.classList.add('hidden');
+    imageBlock.style.filter = '';
   }
-}
+};
 
-function updateEffect(effect, min, max, step) {
+const updateSlider = (effect) => {
+  sliderElement.noUiSlider.on('update', () => {
+    effectLevelCounter.value = parseFloat(sliderElement.noUiSlider.get());
+    changeStyle(effect);
+  });
+};
+
+const updateEffect = (effect) => {
+  const { min, max, step } = effect.slider;
+
   sliderElement.noUiSlider.updateOptions({
     range: {
       min: min,
@@ -140,52 +199,52 @@ function updateEffect(effect, min, max, step) {
     step: step,
   });
 
-  effectStyle = effect;
+  updateSlider(effect);
+};
 
-  changeStyle();
-}
+const setEffect = (evt) => {
+  activeEffect = effectOptions[evt.target.value];
+  changeStyle(activeEffect);
+  updateEffect(activeEffect);
+};
 
-effectsList.addEventListener('click', (evt) => {
-  switch (evt.target.value) {
-    case 'none':
-      effectStyle = 'none';
-      changeStyle();
-      break;
-    case 'chrome':
-      updateEffect('grayscale', 0, 1, 0.1);
-      break;
-    case 'sepia':
-      updateEffect('sepia', 0, 1, 0.1);
-      break;
-    case 'marvin':
-      updateEffect('invert', 0, 100, 1);
-      break;
-    case 'phobos':
-      updateEffect('blur', 0, 3, 0.1);
-      break;
-    case 'heat':
-      updateEffect('brightness', 1, 3, 0.1);
-      break;
-  }
-});
+const openFile = (target) => {
+  scaleCount = Scale.MAX;
+  scaleValue.value = scaleCount;
 
-function openForm() {
-  uploadControl.addEventListener('change', (evt) => {
-    const target = evt.target;
-    const files = target.files;
-    const reader = new FileReader();
+  const files = target.files;
+  const reader = new FileReader();
 
-    reader.addEventListener('load', () => {
-      imageBlock.src = reader.result;
-      openModal(uploadOverlay);
+  reader.addEventListener('load', () => {
+    imageBlock.src = reader.result;
+    effectsList.querySelectorAll('.effects__preview').forEach((effect) => {
+      effect.style.backgroundImage = `url(${reader.result})`;
     });
 
-    reader.readAsDataURL(files[0]);
+    openModal(uploadOverlay);
+  });
+
+  reader.readAsDataURL(files[0]);
+};
+
+const createSlider = () => {
+  noUiSlider.create(sliderElement, {
+    range: {
+      min: 0,
+      max: 100,
+    },
+    start: 100,
+    step: 1,
+    connect: 'lower',
+  });
+};
+
+const openForm = () => {
+  uploadControl.addEventListener('change', (evt) => {
+    openFile(evt.target);
 
     buttonCloseOverlay.addEventListener('click', onButtonCloseClick);
     document.addEventListener('keydown', onModalKeydown);
-
-    scaleCount = 100;
     scaleButtonSmaller.addEventListener('click', onScaleButtonSmallerClick);
     scaleButtonBigger.addEventListener('click', onScaleButtonBiggerClick);
 
@@ -193,6 +252,30 @@ function openForm() {
 
     uploadForm.addEventListener('submit', onSubmitUploadForm);
   });
+
+  createSlider();
+};
+
+function resetElement() {
+  uploadControl.value = '';
+  hashtagField.value = '';
+  commentField.value = '';
+
+  imageBlock.style = '';
+
+  changeStyle(effectOptions[Effect.DEFAULT]);
+
+  effectDefault.checked = true;
+
+  buttonCloseOverlay.removeEventListener('click', onButtonCloseClick);
+  scaleButtonSmaller.removeEventListener('click', onScaleButtonSmallerClick);
+  scaleButtonBigger.removeEventListener('click', onScaleButtonBiggerClick);
+  uploadForm.removeEventListener('submit', onSubmitUploadForm);
+  document.removeEventListener('keydown', onModalKeydown);
 }
+
+effectsList.addEventListener('change', setEffect);
+
+effectLevelContainer.classList.add('hidden');
 
 export { openForm };

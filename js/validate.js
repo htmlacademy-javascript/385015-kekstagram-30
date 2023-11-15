@@ -18,13 +18,13 @@ const validateForm = () => {
     errorTextClass: 'field__error',
   });
 
-  function validateHashTag(value) {
+  const validateHashTag = (value) => {
     hashtagsArray = value.toLowerCase().split(' ');
     const isHashTag = (string) => hashtag.test(string);
     formSubmit.removeAttribute('disabled');
 
     return hashtagsArray.every(isHashTag) || value.length === 0;
-  }
+  };
 
   pristine.addValidator(
     hashtagField,
@@ -32,11 +32,11 @@ const validateForm = () => {
     'Требования к хэш-тегу: знак "#" в начале, от 2 до 20 символов'
   );
 
-  function getHashTagsCount() {
+  const getHashTagsCount = () => {
     const countHashTags = hashtagsArray.length;
 
     return countHashTags <= HASHTAGS_COUNT_MAX;
-  }
+  };
 
   pristine.addValidator(
     hashtagField,
@@ -44,13 +44,13 @@ const validateForm = () => {
     'Максимальное количество хэш-тегов: 5'
   );
 
-  function checkHashTagsDuplicate() {
+  const checkHashTagsDuplicate = () => {
     const uniqCount = hashtagsArray.filter(
       (number, index, numbers) => numbers.indexOf(number) !== index
     );
 
     return uniqCount < hashtagsArray.length;
-  }
+  };
 
   pristine.addValidator(
     hashtagField,
@@ -58,9 +58,7 @@ const validateForm = () => {
     'Хэш-теги повторяются'
   );
 
-  function getCommentLength(value) {
-    return value.length <= COMMENT_LETTERS_MAX;
-  }
+  const getCommentLength = (value) => value.length <= COMMENT_LETTERS_MAX;
 
   pristine.addValidator(
     commentField,

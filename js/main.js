@@ -1,11 +1,13 @@
 import { showMessage } from './message-show.js';
 import { getData } from './api.js';
 import { openForm } from './form.js';
-import { renderBoard } from './render.js';
+import { initBorder } from './render.js';
+import { filterInit } from './filter.js';
 
 getData()
   .then((pictures) => {
-    renderBoard(pictures);
+    initBorder(pictures);
+    filterInit(pictures);
   })
   .catch(() => {
     showMessage('data-error');

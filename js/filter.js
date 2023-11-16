@@ -8,7 +8,7 @@ const COUNT_RANDOM_PHOTOS = 10;
 const OPACITY_NONE = 1;
 const TIMEOUT_SETINTERVAL = 500;
 
-let data;
+let dataArray;
 let buttonID;
 
 const Filter = {
@@ -17,13 +17,13 @@ const Filter = {
   RANDOM: 'filter-random',
 };
 
-const sortPictures = () => data.slice().sort((a, b) => b.likes - a.likes);
+const sortPictures = () => dataArray.slice().sort((a, b) => b.likes - a.likes);
 
 const getRandomIndexes = () => {
   const randomeIndexes = [];
 
   const indexMin = 0;
-  const indexMax = data.length - 1;
+  const indexMax = dataArray.length - 1;
 
   for (let i = indexMin; i < COUNT_RANDOM_PHOTOS; i++) {
     let currentValue = getRandom(indexMin, indexMax);
@@ -40,7 +40,7 @@ const getRandomIndexes = () => {
 const getRandomPictures = () => {
   const randomPictures = [];
 
-  getRandomIndexes().forEach((index) => randomPictures.push(data[index]));
+  getRandomIndexes().forEach((index) => randomPictures.push(dataArray[index]));
 
   return randomPictures;
 };
@@ -48,7 +48,7 @@ const getRandomPictures = () => {
 const getPictures = (filter) => {
   switch (filter) {
     case Filter.DEFAULT:
-      return data;
+      return dataArray;
     case Filter.DISCUSSED:
       return sortPictures();
     case Filter.RANDOM:
@@ -69,8 +69,8 @@ const setButtonClick = (cb) => {
   });
 };
 
-const filterInit = (dataArray) => {
-  data = dataArray;
+const filterInit = (data) => {
+  dataArray = data;
 
   setButtonClick(
     debounce(() => renderBoard(getPictures(buttonID)), TIMEOUT_SETINTERVAL)

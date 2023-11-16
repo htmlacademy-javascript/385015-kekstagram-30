@@ -10,9 +10,10 @@ const onButtonMessageClick = () => {
 };
 
 const onOverlayMessageClick = (evt) => {
-  const blockMessage = document.querySelector('.success__inner');
+  const successMessage = document.querySelector('.success__inner');
+  const errorMessage = document.querySelector('.error__inner');
 
-  if (evt.target !== blockMessage) {
+  if (evt.target !== successMessage && evt.target !== errorMessage) {
     resetElement();
   }
 };
@@ -26,6 +27,7 @@ const onMessageKeydown = (evt) => {
 const showMessage = (templateName, cb = null) => {
   const templateFragment = document.querySelector(`#${templateName}`).content;
   const template = templateFragment.querySelector(`.${templateName}`);
+  let errorServer;
 
   callbackModal = cb;
 
@@ -41,18 +43,23 @@ const showMessage = (templateName, cb = null) => {
 
   if (templateName === 'data-error') {
     setTimeout(() => {
-      container.removeChild(overlayMessage);
+      errorServer = document.querySelector('.data-error');
+      overlayMessage.remove();
     }, MESSAGE_TIMEOUT);
   } else {
     buttonMessage.addEventListener('click', onButtonMessageClick);
     overlayMessage.addEventListener('click', onOverlayMessageClick);
     document.addEventListener('keydown', onMessageKeydown);
     document.removeEventListener('keydown', callbackModal);
+
+    if (errorServer) {
+      errorServer.remove();
+    }
   }
 };
 
 function resetElement() {
-  container.removeChild(overlayMessage);
+  overlayMessage.remove();
 
   buttonMessage.removeEventListener('click', onButtonMessageClick);
   overlayMessage.removeEventListener('click', onOverlayMessageClick);

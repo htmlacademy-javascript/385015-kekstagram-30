@@ -6,8 +6,8 @@ import { filterInit } from './filter.js';
 
 getData()
   .then((pictures) => {
-    initBorder(pictures);
     filterInit(pictures);
+    initBorder(pictures);
   })
   .catch(() => {
     showMessage('data-error');

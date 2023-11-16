@@ -18,11 +18,22 @@ const validateForm = () => {
     errorTextClass: 'field__error',
   });
 
+  const removePrestineElements = () => {
+    document.querySelectorAll('.pristine-error').forEach((block) => {
+      block.remove();
+    });
+  };
+
   const validateHashTag = (value) => {
-    hashtagsArray = value.toLowerCase().split(' ');
+    hashtagsArray = value
+      .toLowerCase()
+      .split(' ')
+      .filter((n) => n)
+      .join(' ')
+      .split(' ');
     const isHashTag = (string) => hashtag.test(string);
     formSubmit.removeAttribute('disabled');
-
+    removePrestineElements();
     return hashtagsArray.every(isHashTag) || value.length === 0;
   };
 

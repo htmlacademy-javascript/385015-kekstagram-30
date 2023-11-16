@@ -45,11 +45,12 @@ const getComments = (comments) => {
   partComments.forEach((commentData) => {
     const commentTemplate = template.cloneNode(true);
     commentTemplate.querySelector('.social__picture').src = commentData.avatar;
+    commentTemplate.querySelector('.social__picture').alt = commentData.name;
     commentTemplate.querySelector('.social__text').textContent =
       commentData.message;
     fragment.append(commentTemplate);
   });
-
+  commentsContainer.innerHTML = '';
   commentsContainer.append(fragment);
 
   imageCommentsCountTotal.textContent = comments.length;

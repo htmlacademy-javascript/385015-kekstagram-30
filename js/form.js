@@ -28,6 +28,8 @@ const effectDefault = document.querySelector('#effect-none');
 const hashtagField = document.querySelector('.text__hashtags');
 const commentField = document.querySelector('.text__description');
 
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
+
 const Scale = {
   MIN: 25,
   MAX: 100,
@@ -113,6 +115,12 @@ const effectOptions = {
 };
 
 let activeEffect = Effect.DEFAULT;
+
+const removePrestineElements = () => {
+  document.querySelectorAll('.pristine-error').forEach((block) => {
+    block.remove();
+  });
+};
 
 const onButtonCloseClick = () => {
   closeModal(uploadOverlay);
@@ -208,23 +216,25 @@ const setEffect = (evt) => {
   updateEffect(activeEffect);
 };
 
-const openFile = (target) => {
+const openFile = () => {
   scaleCount = Scale.MAX;
-  scaleValue.value = scaleCount;
+  scaleValue.value = `${scaleCount}%`;
 
-  const files = target.files;
-  const reader = new FileReader();
+  const file = uploadControl.files[0];
+  const fileName = file.name.toLowerCase();
 
-  reader.addEventListener('load', () => {
-    imageBlock.src = reader.result;
+  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+
+  if (matches) {
+    imageBlock.src = URL.createObjectURL(file);
+
     effectsList.querySelectorAll('.effects__preview').forEach((effect) => {
-      effect.style.backgroundImage = `url(${reader.result})`;
+      effect.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
     });
 
+    removePrestineElements();
     openModal(uploadOverlay);
-  });
-
-  reader.readAsDataURL(files[0]);
+  }
 };
 
 const createSlider = () => {
@@ -240,8 +250,8 @@ const createSlider = () => {
 };
 
 const openForm = () => {
-  uploadControl.addEventListener('change', (evt) => {
-    openFile(evt.target);
+  uploadControl.addEventListener('change', () => {
+    openFile();
 
     buttonCloseOverlay.addEventListener('click', onButtonCloseClick);
     document.addEventListener('keydown', onModalKeydown);
@@ -266,6 +276,8 @@ function resetElement() {
   changeStyle(effectOptions[Effect.DEFAULT]);
 
   effectDefault.checked = true;
+
+  removePrestineElements();
 
   buttonCloseOverlay.removeEventListener('click', onButtonCloseClick);
   scaleButtonSmaller.removeEventListener('click', onScaleButtonSmallerClick);

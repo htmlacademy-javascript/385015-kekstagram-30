@@ -1,3 +1,5 @@
+import { EventOptions, addHandlers, removeHandlers } from './util.js';
+
 const MESSAGE_TIMEOUT = 5000;
 
 const container = document.body;
@@ -25,19 +27,7 @@ const onMessageKeydown = (evt) => {
   }
 };
 
-const removeHandlers = () => {
-  buttonMessage.removeEventListener('click', onButtonMessageClick);
-  overlayMessage.removeEventListener('click', onOverlayMessageClick);
-  document.removeEventListener('keydown', onMessageKeydown);
-  document.addEventListener('keydown', callbackModal);
-};
-
-const addHandlers = () => {
-  buttonMessage.addEventListener('click', onButtonMessageClick);
-  overlayMessage.addEventListener('click', onOverlayMessageClick);
-  document.addEventListener('keydown', onMessageKeydown);
-  document.removeEventListener('keydown', callbackModal);
-};
+const handlers = [[document, EventOptions.TYPE.KEYDOWN, onMessageKeydown]];
 
 const showMessage = (templateName, cb = null) => {
   const templateFragment = document.querySelector(`#${templateName}`).content;
@@ -54,7 +44,13 @@ const showMessage = (templateName, cb = null) => {
   container.append(fragment);
 
   overlayMessage = document.querySelector(`.${templateName}`);
+  handlers.push([
+    overlayMessage,
+    EventOptions.TYPE.CLICK,
+    onOverlayMessageClick,
+  ]);
   buttonMessage = overlayMessage.querySelector('button');
+  handlers.push([buttonMessage, EventOptions.TYPE.CLICK, onButtonMessageClick]);
 
   if (templateName === 'data-error') {
     setTimeout(() => {
@@ -62,7 +58,8 @@ const showMessage = (templateName, cb = null) => {
       overlayMessage.remove();
     }, MESSAGE_TIMEOUT);
   } else {
-    addHandlers();
+    addHandlers(handlers);
+    removeHandlers([[document, EventOptions.TYPE.KEYDOWN, callbackModal]]);
 
     if (errorServer) {
       errorServer.remove();
@@ -73,7 +70,8 @@ const showMessage = (templateName, cb = null) => {
 function resetElement() {
   overlayMessage.remove();
 
-  removeHandlers();
+  removeHandlers(handlers);
+  addHandlers([[document, EventOptions.TYPE.KEYDOWN, callbackModal]]);
 }
 
 export { showMessage };

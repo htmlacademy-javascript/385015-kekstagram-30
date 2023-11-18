@@ -1,3 +1,4 @@
+import { EventOptions, addHandlers, removeHandlers } from './util.js';
 import { openModal, closeModal } from './modal.js';
 
 const COMMENT_SHOW_STEP = 5;
@@ -61,7 +62,7 @@ const getComments = (comments) => {
       ? comments.length
       : partComments.length;
 
-  commentsLoader.addEventListener('click', updateCountComments);
+  addHandlers([[commentsLoader, EventOptions.TYPE.CLICK, updateCountComments]]);
 };
 
 const onButtonCloseClick = () => {
@@ -76,6 +77,11 @@ const onModalKeydown = (evt) => {
   }
 };
 
+const handlers = [
+  [buttonCloseImage, EventOptions.TYPE.CLICK, onButtonCloseClick],
+  [document, EventOptions.TYPE.KEYDOWN, onModalKeydown],
+];
+
 const openImage = ({ url, likes, description, comments }) => {
   imageURL.src = url;
   imageDescription.textContent = description;
@@ -85,20 +91,18 @@ const openImage = ({ url, likes, description, comments }) => {
     comments.length < COMMENT_SHOW_STEP ? comments.length : COMMENT_SHOW_STEP;
 
   getComments(comments);
-
   openModal(modal);
-
-  buttonCloseImage.addEventListener('click', onButtonCloseClick);
-  document.addEventListener('keydown', onModalKeydown);
+  addHandlers(handlers);
 };
 
 function resetElement() {
   commentsContainer.innerHTML = '';
   commentsToRender = 0;
 
-  commentsLoader.removeEventListener('click', updateCountComments);
-  buttonCloseImage.removeEventListener('click', onButtonCloseClick);
-  document.removeEventListener('keydown', onModalKeydown);
+  removeHandlers(handlers);
+  removeHandlers([
+    [commentsLoader, EventOptions.TYPE.CLICK, updateCountComments],
+  ]);
 }
 
 function updateCountComments() {

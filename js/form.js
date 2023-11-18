@@ -1,3 +1,4 @@
+import { EventOptions, addHandlers, removeHandlers } from './util.js';
 import { showMessage } from './message-show.js';
 import { openModal, closeModal } from './modal.js';
 import { validateForm } from './validate.js';
@@ -252,21 +253,13 @@ const createSlider = (effect) => {
   });
 };
 
-const addHandlers = () => {
-  buttonCloseOverlay.addEventListener('click', onButtonCloseClick);
-  scaleButtonSmaller.addEventListener('click', onScaleButtonSmallerClick);
-  scaleButtonBigger.addEventListener('click', onScaleButtonBiggerClick);
-  uploadForm.addEventListener('submit', onUploadFormSubmit);
-  document.addEventListener('keydown', onModalKeydown);
-};
-
-const removeHandlers = () => {
-  buttonCloseOverlay.removeEventListener('click', onButtonCloseClick);
-  scaleButtonSmaller.removeEventListener('click', onScaleButtonSmallerClick);
-  scaleButtonBigger.removeEventListener('click', onScaleButtonBiggerClick);
-  uploadForm.removeEventListener('submit', onUploadFormSubmit);
-  document.removeEventListener('keydown', onModalKeydown);
-};
+const handlers = [
+  [buttonCloseOverlay, EventOptions.TYPE.CLICK, onButtonCloseClick],
+  [scaleButtonSmaller, EventOptions.TYPE.CLICK, onScaleButtonSmallerClick],
+  [scaleButtonBigger, EventOptions.TYPE.CLICK, onScaleButtonBiggerClick],
+  [uploadForm, EventOptions.TYPE.SUBMIT, onUploadFormSubmit],
+  [document, EventOptions.TYPE.KEYDOWN, onModalKeydown],
+];
 
 const clearElements = () => {
   uploadControl.value = '';
@@ -279,7 +272,7 @@ const clearElements = () => {
 const openForm = () => {
   uploadControl.addEventListener('change', () => {
     openFile();
-    addHandlers();
+    addHandlers(handlers);
 
     effectLevelContainer.classList.add('hidden');
   });
@@ -291,12 +284,12 @@ function resetElement() {
   clearElements();
   changeStyle(effectOptions[Effect.DEFAULT]);
   removePrestineElements();
-  removeHandlers();
+  removeHandlers(handlers);
 
   effectDefault.checked = true;
 }
 
-effectsList.addEventListener('change', setEffect);
+addHandlers([[effectsList, EventOptions.TYPE.CHANGE, setEffect]]);
 
 effectLevelContainer.classList.add('hidden');
 

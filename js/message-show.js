@@ -1,4 +1,5 @@
 const MESSAGE_TIMEOUT = 5000;
+
 const container = document.body;
 
 let overlayMessage;
@@ -24,6 +25,20 @@ const onMessageKeydown = (evt) => {
   }
 };
 
+const removeHandlers = () => {
+  buttonMessage.removeEventListener('click', onButtonMessageClick);
+  overlayMessage.removeEventListener('click', onOverlayMessageClick);
+  document.removeEventListener('keydown', onMessageKeydown);
+  document.addEventListener('keydown', callbackModal);
+};
+
+const addHandlers = () => {
+  buttonMessage.addEventListener('click', onButtonMessageClick);
+  overlayMessage.addEventListener('click', onOverlayMessageClick);
+  document.addEventListener('keydown', onMessageKeydown);
+  document.removeEventListener('keydown', callbackModal);
+};
+
 const showMessage = (templateName, cb = null) => {
   const templateFragment = document.querySelector(`#${templateName}`).content;
   const template = templateFragment.querySelector(`.${templateName}`);
@@ -47,10 +62,7 @@ const showMessage = (templateName, cb = null) => {
       overlayMessage.remove();
     }, MESSAGE_TIMEOUT);
   } else {
-    buttonMessage.addEventListener('click', onButtonMessageClick);
-    overlayMessage.addEventListener('click', onOverlayMessageClick);
-    document.addEventListener('keydown', onMessageKeydown);
-    document.removeEventListener('keydown', callbackModal);
+    addHandlers();
 
     if (errorServer) {
       errorServer.remove();
@@ -61,10 +73,7 @@ const showMessage = (templateName, cb = null) => {
 function resetElement() {
   overlayMessage.remove();
 
-  buttonMessage.removeEventListener('click', onButtonMessageClick);
-  overlayMessage.removeEventListener('click', onOverlayMessageClick);
-  document.removeEventListener('keydown', onMessageKeydown);
-  document.addEventListener('keydown', callbackModal);
+  removeHandlers();
 }
 
 export { showMessage };

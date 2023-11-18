@@ -3,6 +3,8 @@ import { openModal, closeModal } from './modal.js';
 import { validateForm } from './validate.js';
 import { sendData } from './api.js';
 
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
+
 const uploadControl = document.querySelector('.img-upload__input');
 const uploadOverlay = document.querySelector('.img-upload__overlay');
 const uploadForm = document.querySelector('.img-upload__form');
@@ -27,8 +29,6 @@ const effectDefault = document.querySelector('#effect-none');
 
 const hashtagField = document.querySelector('.text__hashtags');
 const commentField = document.querySelector('.text__description');
-
-const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 const Scale = {
   MIN: 25,
@@ -138,9 +138,10 @@ const onModalKeydown = (evt) => {
   }
 };
 
-const onSubmitUploadForm = (evt) => {
+const onUploadFormSubmit = (evt) => {
   const isValid = validateForm();
   evt.preventDefault();
+
   if (isValid) {
     uploadFormSubmit.disabled = true;
     sendData(new FormData(evt.target))
@@ -217,13 +218,13 @@ const setEffect = (evt) => {
 };
 
 const openFile = () => {
-  scaleCount = Scale.MAX;
-  scaleValue.value = `${scaleCount}%`;
-
   const file = uploadControl.files[0];
   const fileName = file.name.toLowerCase();
 
   const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+
+  scaleCount = Scale.MAX;
+  scaleValue.value = `${scaleCount}%`;
 
   if (matches) {
     imageBlock.src = URL.createObjectURL(file);
@@ -237,53 +238,62 @@ const openFile = () => {
   }
 };
 
-const createSlider = () => {
+const createSlider = (effect) => {
+  const { min, max, step } = effect.slider;
+
   noUiSlider.create(sliderElement, {
     range: {
-      min: 0,
-      max: 100,
+      min: min,
+      max: max,
     },
-    start: 100,
-    step: 1,
+    start: max,
+    step: step,
     connect: 'lower',
   });
 };
 
-const openForm = () => {
-  uploadControl.addEventListener('change', () => {
-    openFile();
-
-    buttonCloseOverlay.addEventListener('click', onButtonCloseClick);
-    document.addEventListener('keydown', onModalKeydown);
-    scaleButtonSmaller.addEventListener('click', onScaleButtonSmallerClick);
-    scaleButtonBigger.addEventListener('click', onScaleButtonBiggerClick);
-
-    effectLevelContainer.classList.add('hidden');
-
-    uploadForm.addEventListener('submit', onSubmitUploadForm);
-  });
-
-  createSlider();
+const addHandlers = () => {
+  buttonCloseOverlay.addEventListener('click', onButtonCloseClick);
+  scaleButtonSmaller.addEventListener('click', onScaleButtonSmallerClick);
+  scaleButtonBigger.addEventListener('click', onScaleButtonBiggerClick);
+  uploadForm.addEventListener('submit', onUploadFormSubmit);
+  document.addEventListener('keydown', onModalKeydown);
 };
 
-function resetElement() {
+const removeHandlers = () => {
+  buttonCloseOverlay.removeEventListener('click', onButtonCloseClick);
+  scaleButtonSmaller.removeEventListener('click', onScaleButtonSmallerClick);
+  scaleButtonBigger.removeEventListener('click', onScaleButtonBiggerClick);
+  uploadForm.removeEventListener('submit', onUploadFormSubmit);
+  document.removeEventListener('keydown', onModalKeydown);
+};
+
+const clearElements = () => {
   uploadControl.value = '';
   hashtagField.value = '';
   commentField.value = '';
 
   imageBlock.style = '';
+};
 
+const openForm = () => {
+  uploadControl.addEventListener('change', () => {
+    openFile();
+    addHandlers();
+
+    effectLevelContainer.classList.add('hidden');
+  });
+
+  createSlider(effectOptions[Effect.DEFAULT]);
+};
+
+function resetElement() {
+  clearElements();
   changeStyle(effectOptions[Effect.DEFAULT]);
+  removePrestineElements();
+  removeHandlers();
 
   effectDefault.checked = true;
-
-  removePrestineElements();
-
-  buttonCloseOverlay.removeEventListener('click', onButtonCloseClick);
-  scaleButtonSmaller.removeEventListener('click', onScaleButtonSmallerClick);
-  scaleButtonBigger.removeEventListener('click', onScaleButtonBiggerClick);
-  uploadForm.removeEventListener('submit', onSubmitUploadForm);
-  document.removeEventListener('keydown', onModalKeydown);
 }
 
 effectsList.addEventListener('change', setEffect);

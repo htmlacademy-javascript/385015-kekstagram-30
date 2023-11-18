@@ -2,7 +2,7 @@ import { openImage } from './picture-full.js';
 
 const container = document.querySelector('.pictures');
 
-let dataArray;
+let data;
 
 const templateFragment = document.querySelector('#picture').content;
 const template = templateFragment.querySelector('.picture');
@@ -20,20 +20,20 @@ const fillDataTemplate = (
   element.dataset.pictureId = id;
 };
 
-const onClickPreview = (evt) => {
+const onPreviewClick = (evt) => {
   if (evt.target.closest('.picture')) {
     evt.preventDefault();
 
     const preview = evt.target.closest('.picture');
     const pictureID = Number(preview.dataset.pictureId);
-    const pictureObject = dataArray.find((item) => item.id === pictureID);
+    const pictureObject = data.find((item) => item.id === pictureID);
 
     openImage(pictureObject);
   }
 };
 
 const clickPreview = () => {
-  container.addEventListener('click', onClickPreview);
+  container.addEventListener('click', onPreviewClick);
 };
 
 const resetBoard = () => {
@@ -43,10 +43,10 @@ const resetBoard = () => {
   });
 };
 
-const renderBoard = (data) => {
+const renderBoard = (pictures) => {
   resetBoard();
 
-  data.forEach((item) => {
+  pictures.forEach((item) => {
     const element = template.cloneNode(true);
 
     fillDataTemplate(element, item);
@@ -58,9 +58,9 @@ const renderBoard = (data) => {
   clickPreview();
 };
 
-const initBorder = (data) => {
-  dataArray = data;
-  renderBoard(dataArray);
+const initBorder = (pictures) => {
+  data = pictures;
+  renderBoard(data);
 };
 
 export { initBorder, renderBoard };

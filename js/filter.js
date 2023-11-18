@@ -1,14 +1,15 @@
-import { getRandom, debounce } from './util.js';
 import { renderBoard } from './render.js';
-const filterContainer = document.querySelector('.img-filters');
-const filterForm = filterContainer.querySelector('form');
-const filterButtons = filterForm.querySelectorAll('button');
+import { getRandom, debounce } from './util.js';
 
 const COUNT_RANDOM_PHOTOS = 10;
 const OPACITY_NONE = 1;
 const TIMEOUT_SETINTERVAL = 500;
 
-let dataArray;
+const filterContainer = document.querySelector('.img-filters');
+const filterForm = filterContainer.querySelector('form');
+const filterButtons = filterForm.querySelectorAll('button');
+
+let data;
 let buttonID;
 
 const Filter = {
@@ -17,13 +18,13 @@ const Filter = {
   RANDOM: 'filter-random',
 };
 
-const sortPictures = () => dataArray.slice().sort((a, b) => b.likes - a.likes);
+const sortPictures = () => data.slice().sort((a, b) => b.likes - a.likes);
 
 const getRandomIndexes = () => {
   const randomeIndexes = [];
 
   const indexMin = 0;
-  const indexMax = dataArray.length - 1;
+  const indexMax = data.length - 1;
 
   for (let i = indexMin; i < COUNT_RANDOM_PHOTOS; i++) {
     let currentValue = getRandom(indexMin, indexMax);
@@ -40,7 +41,7 @@ const getRandomIndexes = () => {
 const getRandomPictures = () => {
   const randomPictures = [];
 
-  getRandomIndexes().forEach((index) => randomPictures.push(dataArray[index]));
+  getRandomIndexes().forEach((index) => randomPictures.push(data[index]));
 
   return randomPictures;
 };
@@ -48,7 +49,7 @@ const getRandomPictures = () => {
 const getPictures = (filter) => {
   switch (filter) {
     case Filter.DEFAULT:
-      return dataArray;
+      return data;
     case Filter.DISCUSSED:
       return sortPictures();
     case Filter.RANDOM:
@@ -69,8 +70,8 @@ const setButtonClick = (cb) => {
   });
 };
 
-const filterInit = (data) => {
-  dataArray = data;
+const initFilter = (pictures) => {
+  data = pictures;
 
   setButtonClick(
     debounce(() => renderBoard(getPictures(buttonID)), TIMEOUT_SETINTERVAL)
@@ -79,4 +80,4 @@ const filterInit = (data) => {
   filterContainer.style.opacity = OPACITY_NONE;
 };
 
-export { filterInit };
+export { initFilter };

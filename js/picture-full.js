@@ -1,8 +1,9 @@
 import { openModal, closeModal } from './modal.js';
 
 const COMMENT_SHOW_STEP = 5;
+
 let commentsArray = [];
-let commentsRender = 0;
+let commentsToRender = 0;
 
 const modal = document.querySelector('.big-picture');
 const buttonCloseImage = document.querySelector('.big-picture__cancel');
@@ -21,23 +22,24 @@ const commentsLoader = modal.querySelector('.comments-loader');
 
 const getCountComments = (comments) => {
   commentsLoader.classList.remove('hidden');
-  if (commentsRender < comments.length) {
-    commentsRender += COMMENT_SHOW_STEP;
-    if (commentsRender >= comments.length) {
+  if (commentsToRender < comments.length) {
+    commentsToRender += COMMENT_SHOW_STEP;
+    if (commentsToRender >= comments.length) {
       commentsLoader.classList.add('hidden');
     }
   }
 
-  return commentsRender;
+  return commentsToRender;
 };
 
 const getPartComments = (comments) =>
   comments.slice(0, getCountComments(comments));
 
 const getComments = (comments) => {
-  commentsArray = comments;
   const templateFragment = document.querySelector('#comment').content;
   const template = templateFragment.querySelector('.social__comment');
+
+  commentsArray = comments;
 
   const fragment = document.createDocumentFragment();
 
@@ -92,8 +94,9 @@ const openImage = ({ url, likes, description, comments }) => {
 
 function resetElement() {
   commentsContainer.innerHTML = '';
-  commentsRender = 0;
+  commentsToRender = 0;
 
+  commentsLoader.removeEventListener('click', updateCountComments);
   buttonCloseImage.removeEventListener('click', onButtonCloseClick);
   document.removeEventListener('keydown', onModalKeydown);
 }

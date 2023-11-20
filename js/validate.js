@@ -1,6 +1,14 @@
 const HASHTAGS_COUNT_MAX = 5;
 const COMMENT_LETTERS_MAX = 140;
 
+const Message = {
+  INVALIDE_PATTERN:
+    'Требования к хэш-тегу: знак "#" в начале, от 2 до 20 символов',
+  TOO_MANY_TAGS: `Максимальное количество хэш-тегов: ${HASHTAGS_COUNT_MAX}`,
+  NOT_UNIQUE: 'Хэш-теги повторяются',
+  TOO_BIG_COMMENT: `Длина комментария больше ${COMMENT_LETTERS_MAX} символов`,
+};
+
 const validateForm = () => {
   const uploadForm = document.querySelector('.img-upload__form');
   const hashtagField = document.querySelector('.text__hashtags');
@@ -41,7 +49,7 @@ const validateForm = () => {
   pristine.addValidator(
     hashtagField,
     validateHashTag,
-    'Требования к хэш-тегу: знак "#" в начале, от 2 до 20 символов'
+    Message.INVALIDE_PATTERN
   );
 
   const getHashTagsCount = () => {
@@ -50,11 +58,7 @@ const validateForm = () => {
     return countHashTags <= HASHTAGS_COUNT_MAX;
   };
 
-  pristine.addValidator(
-    hashtagField,
-    getHashTagsCount,
-    'Максимальное количество хэш-тегов: 5'
-  );
+  pristine.addValidator(hashtagField, getHashTagsCount, Message.TOO_MANY_TAGS);
 
   const checkHashTagsDuplicate = () => {
     const uniqCount = hashtagsArray.filter(
@@ -67,7 +71,7 @@ const validateForm = () => {
   pristine.addValidator(
     hashtagField,
     checkHashTagsDuplicate,
-    'Хэш-теги повторяются'
+    Message.NOT_UNIQUE
   );
 
   const getCommentLength = (value) => value.length <= COMMENT_LETTERS_MAX;
@@ -75,7 +79,7 @@ const validateForm = () => {
   pristine.addValidator(
     commentField,
     getCommentLength,
-    'Длина комментария больше 140 символов'
+    Message.TOO_BIG_COMMENT
   );
 
   return pristine.validate();

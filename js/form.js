@@ -1,7 +1,10 @@
+import { EventOptions, addHandlers, removeHandlers } from './util.js';
 import { showMessage } from './message-show.js';
 import { openModal, closeModal } from './modal.js';
 import { validateForm } from './validate.js';
 import { sendData } from './api.js';
+
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 const uploadControl = document.querySelector('.img-upload__input');
 const uploadOverlay = document.querySelector('.img-upload__overlay');
@@ -114,6 +117,12 @@ const effectOptions = {
 
 let activeEffect = Effect.DEFAULT;
 
+const removePrestineElements = () => {
+  document.querySelectorAll('.pristine-error').forEach((block) => {
+    block.remove();
+  });
+};
+
 const onButtonCloseClick = () => {
   closeModal(uploadOverlay);
   resetElement();
@@ -130,9 +139,10 @@ const onModalKeydown = (evt) => {
   }
 };
 
-const onSubmitUploadForm = (evt) => {
+const onUploadFormSubmit = (evt) => {
   const isValid = validateForm();
   evt.preventDefault();
+
   if (isValid) {
     uploadFormSubmit.disabled = true;
     sendData(new FormData(evt.target))
@@ -208,73 +218,78 @@ const setEffect = (evt) => {
   updateEffect(activeEffect);
 };
 
-const openFile = (target) => {
+const openFile = () => {
+  const file = uploadControl.files[0];
+  const fileName = file.name.toLowerCase();
+
+  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+
   scaleCount = Scale.MAX;
-  scaleValue.value = scaleCount;
+  scaleValue.value = `${scaleCount}%`;
 
-  const files = target.files;
-  const reader = new FileReader();
+  if (matches) {
+    imageBlock.src = URL.createObjectURL(file);
 
-  reader.addEventListener('load', () => {
-    imageBlock.src = reader.result;
     effectsList.querySelectorAll('.effects__preview').forEach((effect) => {
-      effect.style.backgroundImage = `url(${reader.result})`;
+      effect.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
     });
 
+    removePrestineElements();
     openModal(uploadOverlay);
-  });
-
-  reader.readAsDataURL(files[0]);
+  }
 };
 
-const createSlider = () => {
+const createSlider = (effect) => {
+  const { min, max, step } = effect.slider;
+
   noUiSlider.create(sliderElement, {
     range: {
-      min: 0,
-      max: 100,
+      min: min,
+      max: max,
     },
-    start: 100,
-    step: 1,
+    start: max,
+    step: step,
     connect: 'lower',
   });
 };
 
-const openForm = () => {
-  uploadControl.addEventListener('change', (evt) => {
-    openFile(evt.target);
+const handlers = [
+  [buttonCloseOverlay, EventOptions.TYPE.CLICK, onButtonCloseClick],
+  [scaleButtonSmaller, EventOptions.TYPE.CLICK, onScaleButtonSmallerClick],
+  [scaleButtonBigger, EventOptions.TYPE.CLICK, onScaleButtonBiggerClick],
+  [uploadForm, EventOptions.TYPE.SUBMIT, onUploadFormSubmit],
+  [document, EventOptions.TYPE.KEYDOWN, onModalKeydown],
+];
 
-    buttonCloseOverlay.addEventListener('click', onButtonCloseClick);
-    document.addEventListener('keydown', onModalKeydown);
-    scaleButtonSmaller.addEventListener('click', onScaleButtonSmallerClick);
-    scaleButtonBigger.addEventListener('click', onScaleButtonBiggerClick);
-
-    effectLevelContainer.classList.add('hidden');
-
-    uploadForm.addEventListener('submit', onSubmitUploadForm);
-  });
-
-  createSlider();
-};
-
-function resetElement() {
+const clearElements = () => {
   uploadControl.value = '';
   hashtagField.value = '';
   commentField.value = '';
 
   imageBlock.style = '';
+};
 
+const openForm = () => {
+  uploadControl.addEventListener('change', () => {
+    openFile();
+    addHandlers(handlers);
+
+    effectLevelContainer.classList.add('hidden');
+  });
+
+  createSlider(effectOptions[Effect.DEFAULT]);
+};
+
+function resetElement() {
+  clearElements();
   changeStyle(effectOptions[Effect.DEFAULT]);
+  removePrestineElements();
+  removeHandlers(handlers);
 
   effectDefault.checked = true;
-
-  buttonCloseOverlay.removeEventListener('click', onButtonCloseClick);
-  scaleButtonSmaller.removeEventListener('click', onScaleButtonSmallerClick);
-  scaleButtonBigger.removeEventListener('click', onScaleButtonBiggerClick);
-  uploadForm.removeEventListener('submit', onSubmitUploadForm);
-  document.removeEventListener('keydown', onModalKeydown);
 }
 
-effectsList.addEventListener('change', setEffect);
+addHandlers([[effectsList, EventOptions.TYPE.CHANGE, setEffect]]);
 
 effectLevelContainer.classList.add('hidden');
 

@@ -1,12 +1,13 @@
-import { getRandom, debounce } from './util.js';
 import { renderBoard } from './render.js';
-const filterContainer = document.querySelector('.img-filters');
-const filterForm = filterContainer.querySelector('form');
-const filterButtons = filterForm.querySelectorAll('button');
+import { getRandom, debounce } from './util.js';
 
 const COUNT_RANDOM_PHOTOS = 10;
 const OPACITY_NONE = 1;
 const TIMEOUT_SETINTERVAL = 500;
+
+const filterContainer = document.querySelector('.img-filters');
+const filterForm = filterContainer.querySelector('form');
+const filterButtons = filterForm.querySelectorAll('button');
 
 let data;
 let buttonID;
@@ -69,8 +70,8 @@ const setButtonClick = (cb) => {
   });
 };
 
-const filterInit = (dataArray) => {
-  data = dataArray;
+const initFilter = (pictures) => {
+  data = pictures;
 
   setButtonClick(
     debounce(() => renderBoard(getPictures(buttonID)), TIMEOUT_SETINTERVAL)
@@ -79,4 +80,4 @@ const filterInit = (dataArray) => {
   filterContainer.style.opacity = OPACITY_NONE;
 };
 
-export { filterInit };
+export { initFilter };

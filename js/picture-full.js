@@ -1,8 +1,10 @@
+import { EventOptions, addHandlers, removeHandlers } from './util.js';
 import { openModal, closeModal } from './modal.js';
 
 const COMMENT_SHOW_STEP = 5;
+
 let commentsArray = [];
-let commentsRender = 0;
+let commentsToRender = 0;
 
 const modal = document.querySelector('.big-picture');
 const buttonCloseImage = document.querySelector('.big-picture__cancel');
@@ -21,23 +23,24 @@ const commentsLoader = modal.querySelector('.comments-loader');
 
 const getCountComments = (comments) => {
   commentsLoader.classList.remove('hidden');
-  if (commentsRender < comments.length) {
-    commentsRender += COMMENT_SHOW_STEP;
-    if (commentsRender >= comments.length) {
+  if (commentsToRender < comments.length) {
+    commentsToRender += COMMENT_SHOW_STEP;
+    if (commentsToRender >= comments.length) {
       commentsLoader.classList.add('hidden');
     }
   }
 
-  return commentsRender;
+  return commentsToRender;
 };
 
 const getPartComments = (comments) =>
   comments.slice(0, getCountComments(comments));
 
 const getComments = (comments) => {
-  commentsArray = comments;
   const templateFragment = document.querySelector('#comment').content;
   const template = templateFragment.querySelector('.social__comment');
+
+  commentsArray = comments;
 
   const fragment = document.createDocumentFragment();
 
@@ -45,11 +48,12 @@ const getComments = (comments) => {
   partComments.forEach((commentData) => {
     const commentTemplate = template.cloneNode(true);
     commentTemplate.querySelector('.social__picture').src = commentData.avatar;
+    commentTemplate.querySelector('.social__picture').alt = commentData.name;
     commentTemplate.querySelector('.social__text').textContent =
       commentData.message;
     fragment.append(commentTemplate);
   });
-
+  commentsContainer.innerHTML = '';
   commentsContainer.append(fragment);
 
   imageCommentsCountTotal.textContent = comments.length;
@@ -58,7 +62,7 @@ const getComments = (comments) => {
       ? comments.length
       : partComments.length;
 
-  commentsLoader.addEventListener('click', updateCountComments);
+  addHandlers([[commentsLoader, EventOptions.TYPE.CLICK, updateCountComments]]);
 };
 
 const onButtonCloseClick = () => {
@@ -73,6 +77,11 @@ const onModalKeydown = (evt) => {
   }
 };
 
+const handlers = [
+  [buttonCloseImage, EventOptions.TYPE.CLICK, onButtonCloseClick],
+  [document, EventOptions.TYPE.KEYDOWN, onModalKeydown],
+];
+
 const openImage = ({ url, likes, description, comments }) => {
   imageURL.src = url;
   imageDescription.textContent = description;
@@ -82,19 +91,18 @@ const openImage = ({ url, likes, description, comments }) => {
     comments.length < COMMENT_SHOW_STEP ? comments.length : COMMENT_SHOW_STEP;
 
   getComments(comments);
-
   openModal(modal);
-
-  buttonCloseImage.addEventListener('click', onButtonCloseClick);
-  document.addEventListener('keydown', onModalKeydown);
+  addHandlers(handlers);
 };
 
 function resetElement() {
   commentsContainer.innerHTML = '';
-  commentsRender = 0;
+  commentsToRender = 0;
 
-  buttonCloseImage.removeEventListener('click', onButtonCloseClick);
-  document.removeEventListener('keydown', onModalKeydown);
+  removeHandlers(handlers);
+  removeHandlers([
+    [commentsLoader, EventOptions.TYPE.CLICK, updateCountComments],
+  ]);
 }
 
 function updateCountComments() {

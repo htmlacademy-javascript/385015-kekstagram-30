@@ -1,3 +1,6 @@
+const HASHTAGS_COUNT_MAX = 5;
+const COMMENT_LETTERS_MAX = 140;
+
 const validateForm = () => {
   const uploadForm = document.querySelector('.img-upload__form');
   const hashtagField = document.querySelector('.text__hashtags');
@@ -5,8 +8,6 @@ const validateForm = () => {
   const formSubmit = document.querySelector('.img-upload__submit');
 
   const hashtag = /^#[a-zа-яё0-9]{1,19}$/i;
-  const HASHTAGS_COUNT_MAX = 5;
-  const COMMENT_LETTERS_MAX = 140;
 
   let hashtagsArray = [];
 
@@ -18,11 +19,22 @@ const validateForm = () => {
     errorTextClass: 'field__error',
   });
 
+  const removePrestineElements = () => {
+    document.querySelectorAll('.pristine-error').forEach((block) => {
+      block.remove();
+    });
+  };
+
   const validateHashTag = (value) => {
-    hashtagsArray = value.toLowerCase().split(' ');
+    hashtagsArray = value
+      .toLowerCase()
+      .split(' ')
+      .filter((n) => n)
+      .join(' ')
+      .split(' ');
     const isHashTag = (string) => hashtag.test(string);
     formSubmit.removeAttribute('disabled');
-
+    removePrestineElements();
     return hashtagsArray.every(isHashTag) || value.length === 0;
   };
 

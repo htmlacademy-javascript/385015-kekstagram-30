@@ -1,5 +1,9 @@
+import { EventOptions, addHandlers } from './util.js';
 import { openImage } from './picture-full.js';
+
 const container = document.querySelector('.pictures');
+
+let data;
 
 const templateFragment = document.querySelector('#picture').content;
 const template = templateFragment.querySelector('.picture');
@@ -14,21 +18,23 @@ const fillDataTemplate = (
   element.querySelector('.picture__img').alt = description;
   element.querySelector('.picture__comments').textContent = comments.length;
   element.querySelector('.picture__likes').textContent = likes;
-  element.dataset.pictureID = id;
+  element.dataset.pictureId = id;
 };
 
-const clickPreview = (dataArray) => {
-  container.addEventListener('click', (evt) => {
-    if (evt.target.closest('.picture')) {
-      evt.preventDefault();
+const onPreviewClick = (evt) => {
+  if (evt.target.closest('.picture')) {
+    evt.preventDefault();
 
-      const preview = evt.target.closest('.picture');
-      const pictureID = Number(preview.dataset.pictureID);
-      const pictureObject = dataArray.find((item) => item.id === pictureID);
+    const preview = evt.target.closest('.picture');
+    const pictureID = Number(preview.dataset.pictureId);
+    const pictureObject = data.find((item) => item.id === pictureID);
 
-      openImage(pictureObject);
-    }
-  });
+    openImage(pictureObject);
+  }
+};
+
+const clickPreview = () => {
+  addHandlers([[container, EventOptions.TYPE.CLICK, onPreviewClick]]);
 };
 
 const resetBoard = () => {
@@ -38,10 +44,10 @@ const resetBoard = () => {
   });
 };
 
-const renderBoard = (dataArray) => {
+const renderBoard = (pictures) => {
   resetBoard();
 
-  dataArray.forEach((item) => {
+  pictures.forEach((item) => {
     const element = template.cloneNode(true);
 
     fillDataTemplate(element, item);
@@ -50,11 +56,12 @@ const renderBoard = (dataArray) => {
   });
 
   container.append(fragment);
-  clickPreview(dataArray);
+  clickPreview();
 };
 
-const initBorder = (dataArray) => {
-  renderBoard(dataArray);
+const initBorder = (pictures) => {
+  data = pictures;
+  renderBoard(data);
 };
 
 export { initBorder, renderBoard };

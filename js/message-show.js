@@ -1,4 +1,7 @@
+import { EventOptions, addHandlers, removeHandlers } from './util.js';
+
 const MESSAGE_TIMEOUT = 5000;
+
 const container = document.body;
 
 let overlayMessage;
@@ -10,9 +13,10 @@ const onButtonMessageClick = () => {
 };
 
 const onOverlayMessageClick = (evt) => {
-  const blockMessage = document.querySelector('.success__inner');
+  const successMessage = document.querySelector('.success__inner');
+  const errorMessage = document.querySelector('.error__inner');
 
-  if (evt.target !== blockMessage) {
+  if (evt.target !== successMessage && evt.target !== errorMessage) {
     resetElement();
   }
 };
@@ -23,9 +27,12 @@ const onMessageKeydown = (evt) => {
   }
 };
 
+const handlers = [[document, EventOptions.TYPE.KEYDOWN, onMessageKeydown]];
+
 const showMessage = (templateName, cb = null) => {
   const templateFragment = document.querySelector(`#${templateName}`).content;
   const template = templateFragment.querySelector(`.${templateName}`);
+  let errorServer;
 
   callbackModal = cb;
 
@@ -37,27 +44,34 @@ const showMessage = (templateName, cb = null) => {
   container.append(fragment);
 
   overlayMessage = document.querySelector(`.${templateName}`);
+  handlers.push([
+    overlayMessage,
+    EventOptions.TYPE.CLICK,
+    onOverlayMessageClick,
+  ]);
   buttonMessage = overlayMessage.querySelector('button');
+  handlers.push([buttonMessage, EventOptions.TYPE.CLICK, onButtonMessageClick]);
 
   if (templateName === 'data-error') {
     setTimeout(() => {
-      container.removeChild(overlayMessage);
+      errorServer = document.querySelector('.data-error');
+      overlayMessage.remove();
     }, MESSAGE_TIMEOUT);
   } else {
-    buttonMessage.addEventListener('click', onButtonMessageClick);
-    overlayMessage.addEventListener('click', onOverlayMessageClick);
-    document.addEventListener('keydown', onMessageKeydown);
-    document.removeEventListener('keydown', callbackModal);
+    addHandlers(handlers);
+    removeHandlers([[document, EventOptions.TYPE.KEYDOWN, callbackModal]]);
+
+    if (errorServer) {
+      errorServer.remove();
+    }
   }
 };
 
 function resetElement() {
-  container.removeChild(overlayMessage);
+  overlayMessage.remove();
 
-  buttonMessage.removeEventListener('click', onButtonMessageClick);
-  overlayMessage.removeEventListener('click', onOverlayMessageClick);
-  document.removeEventListener('keydown', onMessageKeydown);
-  document.addEventListener('keydown', callbackModal);
+  removeHandlers(handlers);
+  addHandlers([[document, EventOptions.TYPE.KEYDOWN, callbackModal]]);
 }
 
 export { showMessage };

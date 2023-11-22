@@ -1,4 +1,4 @@
-import { EventOptions, addHandlers, removeHandlers } from './util.js';
+import { eventOptions, addHandlers, removeHandlers } from './util.js';
 import { openModal, closeModal } from './modal.js';
 
 const COMMENT_SHOW_STEP = 5;
@@ -36,7 +36,7 @@ const getCountComments = (comments) => {
 const getPartComments = (comments) =>
   comments.slice(0, getCountComments(comments));
 
-const getComments = (comments) => {
+const processingComments = (comments) => {
   const templateFragment = document.querySelector('#comment').content;
   const template = templateFragment.querySelector('.social__comment');
 
@@ -62,7 +62,7 @@ const getComments = (comments) => {
       ? comments.length
       : partComments.length;
 
-  addHandlers([[commentsLoader, EventOptions.TYPE.CLICK, updateCountComments]]);
+  addHandlers([[commentsLoader, eventOptions.type.click, updateCountComments]]);
 };
 
 const onButtonCloseClick = () => {
@@ -78,8 +78,8 @@ const onModalKeydown = (evt) => {
 };
 
 const handlers = [
-  [buttonCloseImage, EventOptions.TYPE.CLICK, onButtonCloseClick],
-  [document, EventOptions.TYPE.KEYDOWN, onModalKeydown],
+  [buttonCloseImage, eventOptions.type.click, onButtonCloseClick],
+  [document, eventOptions.type.keydown, onModalKeydown],
 ];
 
 const openImage = ({ url, likes, description, comments }) => {
@@ -90,7 +90,7 @@ const openImage = ({ url, likes, description, comments }) => {
   imageCommentsCountShown.textContent =
     comments.length < COMMENT_SHOW_STEP ? comments.length : COMMENT_SHOW_STEP;
 
-  getComments(comments);
+  processingComments(comments);
   openModal(modal);
   addHandlers(handlers);
 };
@@ -101,13 +101,13 @@ function resetElement() {
 
   removeHandlers(handlers);
   removeHandlers([
-    [commentsLoader, EventOptions.TYPE.CLICK, updateCountComments],
+    [commentsLoader, eventOptions.type.click, updateCountComments],
   ]);
 }
 
 function updateCountComments() {
   commentsContainer.innerHTML = '';
-  getComments(commentsArray);
+  processingComments(commentsArray);
 }
 
 resetElement();

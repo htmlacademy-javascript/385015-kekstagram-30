@@ -18,7 +18,8 @@ const Filter = {
   RANDOM: 'filter-random',
 };
 
-const sortPictures = () => data.slice().sort((a, b) => b.likes - a.likes);
+const sortPictures = () =>
+  data.slice().sort((a, b) => b.comments.length - a.comments.length);
 
 const getRandomIndexes = () => {
   const randomeIndexes = [];
@@ -59,14 +60,16 @@ const getPictures = (filter) => {
 
 const setButtonClick = (cb) => {
   filterForm.addEventListener('click', (evt) => {
-    filterButtons.forEach((button) => {
-      button.classList.remove('img-filters__button--active');
-    });
-    evt.target.classList.add('img-filters__button--active');
-
     buttonID = evt.target.getAttribute('id');
 
-    cb();
+    if (buttonID) {
+      filterButtons.forEach((button) => {
+        button.classList.remove('img-filters__button--active');
+      });
+      evt.target.classList.add('img-filters__button--active');
+
+      cb();
+    }
   });
 };
 

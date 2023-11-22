@@ -1,4 +1,4 @@
-import { EventOptions, addHandlers } from './util.js';
+import { eventOptions, addHandlers } from './util.js';
 import { openImage } from './picture-full.js';
 
 const container = document.querySelector('.pictures');
@@ -33,10 +33,6 @@ const onPreviewClick = (evt) => {
   }
 };
 
-const clickPreview = () => {
-  addHandlers([[container, EventOptions.TYPE.CLICK, onPreviewClick]]);
-};
-
 const resetBoard = () => {
   const pictureCollection = container.querySelectorAll('.picture');
   pictureCollection.forEach((element) => {
@@ -56,7 +52,8 @@ const renderBoard = (pictures) => {
   });
 
   container.append(fragment);
-  clickPreview();
+
+  addHandlers([[container, eventOptions.type.click, onPreviewClick]]);
 };
 
 const initBorder = (pictures) => {

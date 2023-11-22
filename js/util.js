@@ -15,16 +15,16 @@ const debounce = (callback, timeoutDelay = 1000) => {
   };
 };
 
-const EventOptions = {
-  TYPE: {
-    CHANGE: 'change',
-    CLICK: 'click',
-    KEYDOWN: 'keydown',
-    SUBMIT: 'submit',
+const eventOptions = {
+  type: {
+    change: 'change',
+    click: 'click',
+    keydown: 'keydown',
+    submit: 'submit',
   },
-  ACTION: {
-    ADD: 'add',
-    REMOVE: 'remove',
+  action: {
+    add: 'add',
+    remove: 'remove',
   },
 };
 
@@ -32,7 +32,7 @@ const updateHandlers = (action, handlers) => {
   handlers.forEach((item) => {
     const [evtTarget, evtType, evtCallback] = item;
 
-    if (action === EventOptions.ACTION.ADD) {
+    if (action === eventOptions.action.add) {
       evtTarget.addEventListener(evtType, evtCallback);
     } else {
       evtTarget.removeEventListener(evtType, evtCallback);
@@ -41,11 +41,11 @@ const updateHandlers = (action, handlers) => {
 };
 
 const addHandlers = (handlers) => {
-  updateHandlers(EventOptions.ACTION.ADD, handlers);
+  updateHandlers(eventOptions.action.add, handlers);
 };
 
 const removeHandlers = (handlers) => {
-  updateHandlers(EventOptions.ACTION.REMOVE, handlers);
+  updateHandlers(eventOptions.action.remove, handlers);
 };
 
-export { getRandom, debounce, EventOptions, addHandlers, removeHandlers };
+export { getRandom, debounce, eventOptions, addHandlers, removeHandlers };

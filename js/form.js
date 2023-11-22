@@ -1,7 +1,7 @@
-import { EventOptions, addHandlers, removeHandlers } from './util.js';
+import { eventOptions, addHandlers, removeHandlers } from './util.js';
 import { showMessage } from './message-show.js';
 import { openModal, closeModal } from './modal.js';
-import { validateForm } from './validate.js';
+import { checkValidity, resetValidity } from './validate.js';
 import { sendData } from './api.js';
 
 const FILE_TYPES = ['jpg', 'jpeg', 'png'];
@@ -117,12 +117,6 @@ const effectOptions = {
 
 let activeEffect = Effect.DEFAULT;
 
-const removePrestineElements = () => {
-  document.querySelectorAll('.pristine-error').forEach((block) => {
-    block.remove();
-  });
-};
-
 const onButtonCloseClick = () => {
   closeModal(uploadOverlay);
   resetElement();
@@ -140,7 +134,7 @@ const onModalKeydown = (evt) => {
 };
 
 const onUploadFormSubmit = (evt) => {
-  const isValid = validateForm();
+  const isValid = checkValidity();
   evt.preventDefault();
 
   if (isValid) {
@@ -234,7 +228,7 @@ const openFile = () => {
       effect.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
     });
 
-    removePrestineElements();
+    resetValidity();
     openModal(uploadOverlay);
   }
 };
@@ -254,11 +248,11 @@ const createSlider = (effect) => {
 };
 
 const handlers = [
-  [buttonCloseOverlay, EventOptions.TYPE.CLICK, onButtonCloseClick],
-  [scaleButtonSmaller, EventOptions.TYPE.CLICK, onScaleButtonSmallerClick],
-  [scaleButtonBigger, EventOptions.TYPE.CLICK, onScaleButtonBiggerClick],
-  [uploadForm, EventOptions.TYPE.SUBMIT, onUploadFormSubmit],
-  [document, EventOptions.TYPE.KEYDOWN, onModalKeydown],
+  [buttonCloseOverlay, eventOptions.type.click, onButtonCloseClick],
+  [scaleButtonSmaller, eventOptions.type.click, onScaleButtonSmallerClick],
+  [scaleButtonBigger, eventOptions.type.click, onScaleButtonBiggerClick],
+  [uploadForm, eventOptions.type.submit, onUploadFormSubmit],
+  [document, eventOptions.type.keydown, onModalKeydown],
 ];
 
 const clearElements = () => {
@@ -269,7 +263,7 @@ const clearElements = () => {
   imageBlock.style = '';
 };
 
-const openForm = () => {
+const initForm = () => {
   uploadControl.addEventListener('change', () => {
     openFile();
     addHandlers(handlers);
@@ -283,14 +277,14 @@ const openForm = () => {
 function resetElement() {
   clearElements();
   changeStyle(effectOptions[Effect.DEFAULT]);
-  removePrestineElements();
+  resetValidity();
   removeHandlers(handlers);
 
   effectDefault.checked = true;
 }
 
-addHandlers([[effectsList, EventOptions.TYPE.CHANGE, setEffect]]);
+addHandlers([[effectsList, eventOptions.type.change, setEffect]]);
 
 effectLevelContainer.classList.add('hidden');
 
-export { openForm };
+export { initForm };

@@ -1,4 +1,4 @@
-import { EventOptions, addHandlers, removeHandlers } from './util.js';
+import { eventOptions, addHandlers, removeHandlers } from './util.js';
 
 const MESSAGE_TIMEOUT = 5000;
 
@@ -13,10 +13,12 @@ const onButtonMessageClick = () => {
 };
 
 const onOverlayMessageClick = (evt) => {
-  const successMessage = document.querySelector('.success__inner');
-  const errorMessage = document.querySelector('.error__inner');
+  const messageBlock = overlayMessage.querySelector('div');
+  const messageHeader = overlayMessage.querySelector('h2');
 
-  if (evt.target !== successMessage && evt.target !== errorMessage) {
+  if (evt.target === messageBlock || evt.target === messageHeader) {
+    evt.stopPropagation();
+  } else {
     resetElement();
   }
 };
@@ -27,7 +29,7 @@ const onMessageKeydown = (evt) => {
   }
 };
 
-const handlers = [[document, EventOptions.TYPE.KEYDOWN, onMessageKeydown]];
+const handlers = [[document, eventOptions.type.keydown, onMessageKeydown]];
 
 const showMessage = (templateName, cb = null) => {
   const templateFragment = document.querySelector(`#${templateName}`).content;
@@ -46,11 +48,11 @@ const showMessage = (templateName, cb = null) => {
   overlayMessage = document.querySelector(`.${templateName}`);
   handlers.push([
     overlayMessage,
-    EventOptions.TYPE.CLICK,
+    eventOptions.type.click,
     onOverlayMessageClick,
   ]);
   buttonMessage = overlayMessage.querySelector('button');
-  handlers.push([buttonMessage, EventOptions.TYPE.CLICK, onButtonMessageClick]);
+  handlers.push([buttonMessage, eventOptions.type.click, onButtonMessageClick]);
 
   if (templateName === 'data-error') {
     setTimeout(() => {
@@ -59,7 +61,7 @@ const showMessage = (templateName, cb = null) => {
     }, MESSAGE_TIMEOUT);
   } else {
     addHandlers(handlers);
-    removeHandlers([[document, EventOptions.TYPE.KEYDOWN, callbackModal]]);
+    removeHandlers([[document, eventOptions.type.keydown, callbackModal]]);
 
     if (errorServer) {
       errorServer.remove();
@@ -71,7 +73,7 @@ function resetElement() {
   overlayMessage.remove();
 
   removeHandlers(handlers);
-  addHandlers([[document, EventOptions.TYPE.KEYDOWN, callbackModal]]);
+  addHandlers([[document, eventOptions.type.keydown, callbackModal]]);
 }
 
 export { showMessage };

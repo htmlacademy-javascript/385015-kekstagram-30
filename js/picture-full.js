@@ -36,7 +36,7 @@ const getCountComments = (comments) => {
 const getPartComments = (comments) =>
   comments.slice(0, getCountComments(comments));
 
-const processingComments = (comments) => {
+const renderComments = (comments) => {
   const templateFragment = document.querySelector('#comment').content;
   const template = templateFragment.querySelector('.social__comment');
 
@@ -90,7 +90,7 @@ const openImage = ({ url, likes, description, comments }) => {
   imageCommentsCountShown.textContent =
     comments.length < COMMENT_SHOW_STEP ? comments.length : COMMENT_SHOW_STEP;
 
-  processingComments(comments);
+  renderComments(comments);
   openModal(modal);
   addHandlers(handlers);
 };
@@ -107,7 +107,7 @@ function resetElement() {
 
 function updateCountComments() {
   commentsContainer.innerHTML = '';
-  processingComments(commentsArray);
+  renderComments(commentsArray);
 }
 
 resetElement();
